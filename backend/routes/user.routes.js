@@ -29,6 +29,28 @@
  *     responses:
  *       201:
  *         description: User registered successfully
+ * 
+ * /api/users/login:
+ *   post:
+ *     summary: Login a user
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: indal@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ * 
  */
 
 
@@ -72,5 +94,13 @@ router.post(
 ); // for registering the user
 
 // userController.registerUser mean's when the user hit the /register endpoint then the registerUser function from the userController maii registerUser will be called.
+
+
+// creating the login rotues
+router.post('/login', [
+    body("email").isEmail().withMessage("Please use a valid email address.").isLength({ min: 5 }).withMessage("email should be at least 5 characters"),
+    body("password").isString().withMessage("password should be string").isLength({ min: 6 }).withMessage("password should be at least 6 characters"),
+], userController.loginUser) // for login the user
+
 
 module.exports = router; // exporting the router for using in the app.js file
