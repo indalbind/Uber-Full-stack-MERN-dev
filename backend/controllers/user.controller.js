@@ -57,5 +57,14 @@ module.exports.loginUser = async (req, res, next) => {
 
     const token = user.generateAuthToken(); // for generating the token for the user when he login or register.
 
+    res.cookie('token', token, { httpOnly: true, secure: true }); // for setting the token in the cookie for authentication. httpOnly: true mean's the cookie can not be accessed by the client side javascript and secure: true mean's the cookie will only be sent over https.
+
     res.status(200).json({ token, user }); // for sending the token to the user for authentication.
 };       
+
+
+module.exports.getUserProfile = async (req, res, next) => {
+    // Now we have to make the middileware so that we can get the user from the token and then we can send the user profile to the user. and if the user is not authenticated then we will return the error or you not able to access this route.
+
+    res.status(200).json({ user: req.user }) // req.user is the user which we get from the token in the auth middleware and we have attached the user to the request object in the auth middleware so that we can access the user in the controller and then we will send the user profile to the user.
+}

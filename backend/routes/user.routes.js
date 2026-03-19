@@ -5,6 +5,8 @@ const { body } = require("express-validator"); // for validating the request bod
 
 const userController = require("../controllers/user.controller"); // importing the user controller for performing the operations on the user
 
+const authMiddleware = require('../middlewares/auth.middleware') // importing the auth middleware for performing the authentication of the user
+
 router.post(
     "/register",
     [
@@ -44,6 +46,9 @@ router.post('/login', [
     body("email").isEmail().withMessage("Please use a valid email address.").isLength({ min: 5 }).withMessage("email should be at least 5 characters"),
     body("password").isString().withMessage("password should be string").isLength({ min: 6 }).withMessage("password should be at least 6 characters"),
 ], userController.loginUser) // for login the user
+
+
+router.get('/profile' , authMiddleware.authUser, userController.getUserProfile) // for getting the user profile
 
 
 module.exports = router; // exporting the router for using in the app.js file

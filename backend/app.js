@@ -14,7 +14,7 @@ const userRoutes = require('./routes/user.routes')
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
 
-
+const cookiesParser = require('cookie-parser') // for parsing the cookies from the request header
 
 conneectToDb(); // calling the database creation file 
 
@@ -23,6 +23,8 @@ app.use(cors()) // for know am let accept request from all place.
 
 app.use(express.json()) // for parsing the json data from the request body.
 app.use(express.urlencoded({ extended: true })) // for parsing the urlencoded data from the request body.
+
+app.use(cookiesParser()) // for parsing the cookies from the request header
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // for using the swagger
 
