@@ -4,7 +4,6 @@ const userService = require('../services/user.service') // importing the user se
 const bcrypt = require('bcrypt') // for hashing the password
 
 
-
 module.exports.authUser = async (req, res, next) => {
 
     // here first we have to check the token from header or cookies. now once we got the token then we have to verify the token and then we will get the user id from the token and then we will find the user in the database by using the user id and then we will attach the user to the request object and then we will call the next function for moving to the next middleware or controller.
@@ -12,6 +11,11 @@ module.exports.authUser = async (req, res, next) => {
 
     if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." });
+    }
+    const isBlacklisted = await User.findOne({token: token}); // for checking the token is blacklisted or not in the blacklist token collection. if the token is blacklisted then we will return the error to the user.
+
+    if (isBlacklisted) {
+        return res.status(401).json({ message: "Access denied. Token is blacklisted." });
     }
 
     // if we got the token then we have to decode the token and after decoding we will get the data in token which we using to create the token where in usermodel we have did like jwt.sign({ _id: this._id } mean's we create the token with the _id(user_id) so when we decode we only get the id in the token. 

@@ -50,5 +50,7 @@ router.post('/login', [
 
 router.get('/profile' , authMiddleware.authUser, userController.getUserProfile) // for getting the user profile
 
+router.post('/logout', authMiddleware.authUser, userController.logoutUser) // for logout the user
+
 
 module.exports = router; // exporting the router for using in the app.js file

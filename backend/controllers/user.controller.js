@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken') // for creating the token
 const userService = require('../services/user.service') // importing the user service for performing the operations on the user
 const { validationResult } = require('express-validator') // for validating the request body from express-validator package
 
+const BlacklistToken = require('../models/blacklistToken.model') // importing the blacklist token model for performing the operations on the blacklist token
+
 // creating the API for register the user
 
 module.exports.registerUser = async (req, res, next) => {
@@ -67,4 +69,21 @@ module.exports.getUserProfile = async (req, res, next) => {
     // Now we have to make the middileware so that we can get the user from the token and then we can send the user profile to the user. and if the user is not authenticated then we will return the error or you not able to access this route.
 
     res.status(200).json({ user: req.user }) // req.user is the user which we get from the token in the auth middleware and we have attached the user to the request object in the auth middleware so that we can access the user in the controller and then we will send the user profile to the user.
+}
+
+module.exports.logoutUser = async (req, res, next) => {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; // for getting the token from the cookie which we have set in the login route.
+    
+    if (!token) {
+        // mean's if there is no token in the cookie then we will return the error to the user.
+        return res.status(400).json({ message: "No token provided" }); // if there is no token in the cookie then we will return the error to the user.
+    }
+
+    // for blacklisting the token so that the user can not use the same token for authentication.
+    await BlacklistToken.create({ token });
+
+    // for removing the token from the cookie.
+    res.clearCookie('token');
+
+    res.status(200).json({ message: "You have been logged out successfully." });
 }

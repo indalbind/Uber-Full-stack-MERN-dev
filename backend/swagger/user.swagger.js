@@ -50,5 +50,25 @@
  *     responses:
  *       200:
  *         description: User logged in successfully
- *
+ * 
+ * /api/users/profile:
+ *  get:
+ *    summary: Get user profile
+ *    tags: [User]
+ *    security:
+ *     - bearerAuth: []
+ *    responses:
+ *     200:
+ *      description: User all profile retrieved successfully
+ * 
+ * /api/users/logout:
+ * post:
+ *    summary: Logout a user    
+ *    tags: [User]
+ *    security:
+ *    - bearerAuth: []
+ *    responses:
+ *      200:
+ *       description: User logged out successfully
+ * 
  */
