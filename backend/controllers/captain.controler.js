@@ -1,7 +1,7 @@
 const captainModel = require("../models/captain.model")
 const captainService = require("../services/captain.service") // importing the captain service for performing the operations on the captain
 const { validationResult } = require("express-validator");
-
+const BlacklistToken = require('../models/blacklistToken.model') // importing the blacklist token model for performing the operations on the blacklist token
 
 module.exports.registerCaptain = async (req, res) => {
     const error = validationResult(req) // all error go in the req and we will check the error by using the validationResult function from the express-validator package.
@@ -34,4 +34,57 @@ module.exports.registerCaptain = async (req, res) => {
     const token = captain.generateAuthToken() // for generating the token for the captain when he login or register.
 
     res.status(201).json({ token, captain }) // for sending the token to the captain for authentication.
+}
+ 
+module.exports.loginCaptain = async (req, res) => {
+    const error = validationResult(req)
+    if (!error.isEmpty()) {
+        return res.status(400).json({ errors: error.array() })
+    }
+
+    const { email, password } = req.body;
+
+    const captain = await captainModel.findOne({ email }).select('+password') // for finding the captain in the database by email and we will select the password field for comparing the password when the captain login.
+
+    if (!captain) {
+        // mean's if there is no captain with this email then we will return the error to the user.
+        return res.status(400).json({ message: "Invalid email or password" }) // if there is no captain with this email then we will return the error to the user.
+    }
+
+    const isPasswordMatch = await captain.comparePassword(password) // for comparing the password when the captain login.
+
+    if (!isPasswordMatch) {
+        // mean's if the password is not match then we will return the error to the user.
+        return res.status(400).json({ message: "Invalid email or password" }) // if the password is not match then we will return the error to the user.
+    }
+
+    const token = captain.generateAuthToken() // for generating the token for the captain when he login or register.
+
+    res.cookie('token', token, { httpOnly: true, secure: true }) // for setting the token in the cookie for authentication.
+
+    res.status(200).json({ token, captain }) // for sending the token to the captain for
+}
+
+
+module.exports.getCaptainProfile = async (req, res) => {
+    // Now we have to make the middileware so that we can get the user from the token and then we can send the user profile to the user. and if the user is not authenticated then we will return the error or you not able to access this route.
+    res.status(200).json({ captain: req.captain });
+}
+
+
+module.exports.logoutCaptain = async (req, res) => {
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; // for getting the token from the cookie which we have set in the login route.
+    
+    if (!token) {
+        // mean's if there is no token in the cookie then we will return the error to the user.
+        return res.status(400).json({ message: "No token provided" }); // if there is no token in the cookie then we will return the error to the user.
+    }
+
+    // for blacklisting the token so that the user can not use the same token for authentication.
+    await BlacklistToken.create({ token });
+
+    // for removing the token from the cookie.
+    res.clearCookie('token');
+
+    res.status(200).json({ message: "You have been logged out successfully." });
 }
