@@ -13,8 +13,6 @@ const UserContext = ({ children }) => {
         }
     );
 
-    const [captainSignupData, setCaptainSignupData] = useState({});
-
     return (
         <div>
             <UserDataContext.Provider value={{}}>
