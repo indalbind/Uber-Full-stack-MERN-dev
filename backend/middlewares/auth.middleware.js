@@ -2,6 +2,7 @@ const User = require('../models/user.model') // for importing the user model for
 const jwt = require('jsonwebtoken') // for creating the token
 const userService = require('../services/user.service') // importing the user service for performing the operations on the user
 const bcrypt = require('bcrypt') // for hashing the password
+const BlacklistToken = require('../models/blacklistToken.model') // importing the blacklist token model
 
 
 module.exports.authUser = async (req, res, next) => {
@@ -12,7 +13,7 @@ module.exports.authUser = async (req, res, next) => {
     if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." });
     }
-    const isBlacklisted = await User.findOne({token: token}); // for checking the token is blacklisted or not in the blacklist token collection. if the token is blacklisted then we will return the error to the user.
+    const isBlacklisted = await BlacklistToken.findOne({ token: token }); // for checking the token is blacklisted or not in the blacklist token collection. if the token is blacklisted then we will return the error to the user.
 
     if (isBlacklisted) {
         return res.status(401).json({ message: "Access denied. Token is blacklisted." });

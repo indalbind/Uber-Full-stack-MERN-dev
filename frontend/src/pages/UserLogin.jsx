@@ -1,21 +1,48 @@
 import React, { useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { UserDataContext } from '../context/UserContext';
+
+
 
 const UserLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userLoginData, setUserData] = useState({});
 
-    const submitHandler = (e) => {
+    const navigate = useNavigate(); // for navigating to the home page after successful login
+    const { user, setUser } = React.useContext(UserDataContext)
+    
+    const submitHandler = async (e) => {
         e.preventDefault();
-        setEmail('')
-        setPassword('')
-        setUserData({
+
+        const userData = {
             email: email,
             password: password
-        })
-        console.log(userLoginData);
-        
+        };
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData); // for sending the data to the backend;
+
+            if (response.status === 200) {
+                const data = response.data;
+                setUser(data.user); // for setting the user data in the context -> why the data.user here ? because of data are 
+                
+
+                localStorage.setItem('token', data.token); // store the token for authenticated requests
+                navigate("/User-Home"); // for navigating to the home page after successful login
+            }
+        } catch (error) {
+            if (error.response) {
+                // Backend returned an error (401, 400, etc.)
+                alert(error.response.data.message || "Invalid email or password");
+            } else {
+                alert("Something went wrong. Please try again.");
+            }
+        }
+
+        setEmail("");
+        setPassword("");
     };
 
 

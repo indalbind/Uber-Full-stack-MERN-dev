@@ -12,15 +12,15 @@ const UserContext = ({ children }) => {
         password: '' 
         }
     );
-
+    const [user, setUser] = useState(null); // State to hold the user data
     return (
         <div>
-            <UserDataContext.Provider value={{}}>
+            <UserDataContext.Provider value={{ user, setUser }}>
+                {/* Provide the user data and the function to update it to the children components */}
                 {children} {/* Render the children components */}
             </UserDataContext.Provider>
-
         </div>
-    )
+    );
 }
 
 export default UserContext; 
