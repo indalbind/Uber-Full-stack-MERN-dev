@@ -10,7 +10,7 @@ const UserProtectWrapper = ({children}) => {
     if (!token) {
         navigate('/login')
     }
-
+ 
     return (
         <>
             {children}
